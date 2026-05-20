@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xyro IQ — Predict. Prevent. Protect.</title>
+    <meta name="description" content="AI-Powered Prior Authorization Intelligence for Healthcare Revenue Cycle Management">
+    <meta property="og:title" content="Xyro IQ — Predict. Prevent. Protect."/>
+    <meta property="og:description" content="AI-Powered Prior Authorization Intelligence for Healthcare RCM"/>
+    <meta name="twitter:card" content="summary"/>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* ═══════════════════════════════════════════
+           DESIGN TOKENS — CHANGE COLORS HERE ONLY
+        ═══════════════════════════════════════════ */
+        :root {
+            /* Brand */
+            --primary:          #2563EB;
+            --secondary:        #7C3AED;
+            --gradient:         linear-gradient(135deg, #2563EB, #7C3AED);
+            --gradient-text:    linear-gradient(135deg, #60A5FA, #A78BFA);
+
+            /* Status */
+            --success:          #10B981;
+            --warning:          #F59E0B;
+            --danger:           #EF4444;
+
+            /* Dark Mode (default — video page stays dark always) */
+            --bg:               #080818;
+            --bg-surface:       rgba(255,255,255,0.05);
+            --bg-card:          rgba(255,255,255,0.06);
+            --border:           rgba(255,255,255,0.10);
+            --text-primary:     #FFFFFF;
+            --text-secondary:   rgba(255,255,255,0.60);
+            --text-muted:       rgba(255,255,255,0.35);
+
+            /* Orbs */
+            --orb-1:            rgba(37,99,235,0.18);
+            --orb-2:            rgba(124,58,237,0.18);
+            --orb-3:            rgba(37,99,235,0.10);
+
+            /* Grid */
+            --grid-color:       rgba(37,99,235,0.05);
+
+            /* Radius */
+            --radius-sm:        8px;
+            --radius-md:        12px;
+            --radius-lg:        16px;
+            --radius-full:      50px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* ═══════════════════════════════════════════
+           VIDEO SCREEN
+        ═══════════════════════════════════════════ */
+        #video-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1.2s ease;
+        }
+
+        #video-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #intro-video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        @media (orientation: landscape) {
+            #intro-video { object-fit: cover; }
+        }
+
+        /* ── Fallback ── */
+        .no-video-bg {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--bg) 0%, #100830 50%, var(--bg) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .no-video-logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        .no-video-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            font-family: 'Exo 2', sans-serif;
+            margin-bottom: 0.5rem;
+        }
+
+        .no-video-title .xyro { color: white; }
+        .no-video-title .iq {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .no-video-sub {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            max-width: 420px;
+            line-height: 1.6;
+            margin-top: 0.75rem;
+        }
+
+        .no-video-tagline {
+            margin-top: 1.25rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(37,99,235,0.4)); }
+            50% { transform: scale(1.06); filter: drop-shadow(0 0 40px rgba(124,58,237,0.6)); }
+        }
+
+        /* ═══════════════════════════════════════════
+           VIDEO CONTROLS
+        ═══════════════════════════════════════════ */
+        .skip-btn {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 100;
+            background: rgba(255,255,255,0.10);
+            border: 1px solid rgba(255,255,255,0.20);
+            color: rgba(255,255,255,0.70);
+            padding: 0.5rem 1.25rem;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .skip-btn:hover {
+            background: rgba(255,255,255,0.20);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .unmute-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 100;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.30);
+            color: white;
+            padding: 0.65rem 1.4rem;
+            border-radius: var(--radius-full);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .unmute-btn:hover {
+            background: rgba(255,255,255,0.28);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .playpause-btn {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.30);
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .playpause-btn:hover {
+            background: rgba(255,255,255,0.28);
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .video-progress {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: var(--gradient);
+            width: 0%;
+            z-index: 100;
+            transition: width 0.3s linear;
+            box-shadow: 0 0 10px rgba(37,99,235,0.8);
+        }
+
+        /* ═══════════════════════════════════════════
+           ROTATE OVERLAY
+        ═══════════════════════════════════════════ */
+        #rotate-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        #rotate-overlay.show { display: flex; }
+
+        .rotate-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            display: block;
+            animation: rotateAnim 2s ease-in-out infinite;
+        }
+
+        @keyframes rotateAnim {
+            0%   { transform: rotate(0deg); }
+            30%  { transform: rotate(90deg); }
+            60%  { transform: rotate(90deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .rotate-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .rotate-sub {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 280px;
+            margin-bottom: 2rem;
+        }
+
+        .rotate-skip {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.6rem 1.5rem;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .rotate-skip:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+        /* ═══════════════════════════════════════════
+           LANDING SCREEN
+        ═══════════════════════════════════════════ */
+        #landing-screen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.5s ease;
+        }
+
+        #landing-screen.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .landing-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 15% 50%, var(--orb-1) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 20%, var(--orb-2) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 90%, var(--orb-3) 0%, transparent 55%),
+                var(--bg);
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: float 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .orb-1 {
+            width: 400px; height: 400px;
+            background: var(--orb-1);
+            top: -100px; left: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 300px; height: 300px;
+            background: var(--orb-2);
+            bottom: -50px; right: -50px;
+            animation-delay: -3s;
+        }
+
+        .orb-3 {
+            width: 200px; height: 200px;
+            background: var(--orb-3);
+            top: 50%; left: 50%;
+            animation-delay: -6s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        .grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        /* ── CONTENT ── */
+        .landing-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 2rem;
+            max-width: 820px;
+            width: 100%;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(37,99,235,0.15);
+            border: 1px solid rgba(37,99,235,0.30);
+            color: rgba(255,255,255,0.80);
+            padding: 0.4rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            animation: slideDown 0.6s ease 0.3s both;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Logo SVG */
+        .landing-logo {
+            display: block;
+            margin: 0 auto 1.75rem;
+            filter: drop-shadow(0 0 30px rgba(37,99,235,0.5));
+            animation: slideDown 0.6s ease 0.5s both, logoGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(37,99,235,0.4)); }
+            50% { filter: drop-shadow(0 0 45px rgba(124,58,237,0.7)); }
+        }
+
+        /* Title */
+        .landing-title {
+            font-family: 'Exo 2', sans-serif;
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 0.35rem;
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            letter-spacing: -2px;
+            animation: slideDown 0.6s ease 0.7s both;
+        }
+
+        .title-xyro {
+            color: white;
+        }
+
+        .title-iq {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Tagline */
+        .landing-tagline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.65rem;
+            margin-bottom: 2rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            animation: slideDown 0.6s ease 0.9s both;
+        }
+
+        .tagline-line {
+            width: 30px;
+            height: 1.5px;
+            border-radius: 1px;
+        }
+
+        .tagline-line-l { background: linear-gradient(90deg, transparent, var(--primary)); }
+        .tagline-line-r { background: linear-gradient(90deg, var(--secondary), transparent); }
+        .tag-predict { color: #60A5FA; }
+        .tag-prevent { color: #818CF8; }
+        .tag-protect { color: #A78BFA; }
+        .tag-dot { color: #7C3AED; font-size: 0.5rem; }
+
+        /* Quote */
+        .quote-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.75rem;
+            margin-bottom: 2.5rem;
+            animation: slideDown 0.6s ease 1.1s both;
+        }
+
+        .quote-text {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        /* Feature pills */
+        .feature-pills {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+            animation: slideDown 0.6s ease 1.2s both;
+        }
+
+        .pill {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.4rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* CTA */
+        .cta-wrap {
+            animation: slideDown 0.6s ease 1.4s both;
+        }
+
+        .cta-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1.2rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            background: var(--gradient);
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            box-shadow: 0 10px 40px rgba(37,99,235,0.4);
+            animation: ctaPulse 2.5s ease-in-out infinite 2s;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(37,99,235,0.6), 0 0 0 8px rgba(37,99,235,0.1);
+        }
+
+        .cta-btn:active { transform: translateY(-1px) scale(0.99); }
+
+        @keyframes ctaPulse {
+            0%, 100% { box-shadow: 0 10px 40px rgba(37,99,235,0.4), 0 0 0 0 rgba(37,99,235,0.3); }
+            50% { box-shadow: 0 10px 40px rgba(37,99,235,0.4), 0 0 0 12px rgba(37,99,235,0); }
+        }
+
+        .cta-arrow { transition: transform 0.3s ease; font-size: 1.2rem; }
+        .cta-btn:hover .cta-arrow { transform: translateX(5px); }
+
+        .cta-sub {
+            margin-top: 1rem;
+            font-size: 0.80rem;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        /* Powered by */
+        .powered-by {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            z-index: 30;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .landing-title { font-size: 3rem; letter-spacing: -1px; }
+            .cta-btn { padding: 1rem 2rem; font-size: 1rem; }
+            .feature-pills { gap: 0.5rem; }
+            .pill { font-size: 0.72rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ════════ ROTATE OVERLAY ════════ -->
+    <div id="rotate-overlay">
+        <span class="rotate-icon">📱</span>
+        <div class="rotate-title">Rotate Your Phone</div>
+        <div class="rotate-sub">
+            This video is best experienced in landscape mode.
+            Please rotate your device horizontally.
+        </div>
+        <button class="rotate-skip" onclick="dismissRotate()">
+            Continue in Portrait →
+        </button>
+    </div>
+
+    <!-- ════════ VIDEO SCREEN ════════ -->
+    <div id="video-screen">
+        <video
+            id="intro-video"
+            playsinline
+            autoplay
+            muted
+            onended="showLanding()"
+            ontimeupdate="updateProgress()"
+            onerror="showNoVideo()">
+            <source src="assets/video.mp4" type="video/mp4">
+        </video>
+
+        <!-- Fallback -->
+        <div class="no-video-bg" id="no-video-fallback" style="display:none;">
+            <!-- Xyro IQ SVG Logo -->
+            <svg class="no-video-logo" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="fgShield" x1="20%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#1D4ED8"/>
+                        <stop offset="50%" stop-color="#4338CA"/>
+                        <stop offset="100%" stop-color="#7C3AED"/>
+                    </linearGradient>
+                    <linearGradient id="fgCross" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#93C5FD"/>
+                        <stop offset="100%" stop-color="#C4B5FD"/>
+                    </linearGradient>
+                    <linearGradient id="fgSpeed" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#3B82F6" stop-opacity="0"/>
+                        <stop offset="100%" stop-color="#3B82F6"/>
+                    </linearGradient>
+                </defs>
+                <rect x="12" y="82" width="30" height="4" rx="2" fill="url(#fgSpeed)" opacity="0.9"/>
+                <rect x="18" y="92" width="22" height="3.5" rx="1.75" fill="url(#fgSpeed)" opacity="0.7"/>
+                <rect x="24" y="101" width="16" height="3" rx="1.5" fill="url(#fgSpeed)" opacity="0.5"/>
+                <rect x="8" y="66" width="7" height="7" rx="1.5" fill="#3B82F6" opacity="0.8"/>
+                <rect x="18" y="58" width="5" height="5" rx="1" fill="#3B82F6" opacity="0.6"/>
+                <rect x="6" y="116" width="5" height="5" rx="1" fill="#3B82F6" opacity="0.4"/>
+                <path d="M100 22 L162 44 L162 98 C162 140 100 178 100 178 C100 178 38 140 38 98 L38 44 Z" fill="url(#fgShield)"/>
+                <path d="M100 22 L162 44 L162 98 C162 140 100 178 100 178 L100 22 Z" fill="rgba(255,255,255,0.08)"/>
+                <path d="M100 22 L162 44 L162 98 C162 140 100 178 100 178 C100 178 38 140 38 98 L38 44 Z" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+                <circle cx="100" cy="100" r="38" fill="none" stroke="url(#fgCross)" stroke-width="3"/>
+                <circle cx="100" cy="100" r="38" fill="rgba(255,255,255,0.05)"/>
+                <rect x="92" y="74" width="16" height="52" rx="5" fill="url(#fgCross)" opacity="0.95"/>
+                <rect x="74" y="92" width="52" height="16" rx="5" fill="url(#fgCross)" opacity="0.95"/>
+                <circle cx="170" cy="62" r="7" fill="#7C3AED"/>
+                <circle cx="170" cy="62" r="7" fill="none" stroke="#A78BFA" stroke-width="1.5" opacity="0.8"/>
+                <circle cx="166" cy="122" r="5.5" fill="#5B21B6"/>
+                <circle cx="166" cy="122" r="5.5" fill="none" stroke="#A78BFA" stroke-width="1.5" opacity="0.7"/>
+                <path d="M 170 69 Q 185 92 166 116" fill="none" stroke="#A78BFA" stroke-width="2" stroke-dasharray="4 3" opacity="0.8"/>
+            </svg>
+            <div class="no-video-title">
+                <span class="xyro">Xyro</span><span class="iq">IQ</span>
+            </div>
+            <div class="no-video-sub">
+                AI-Powered Prior Authorization Intelligence<br>
+                for Healthcare Revenue Cycle Management
+            </div>
+            <div class="no-video-tagline">Predict &bull; Prevent &bull; Protect</div>
+        </div>
+    </div>
+
+    <!-- Skip -->
+    <button class="skip-btn" onclick="showLanding()">Skip Intro ›</button>
+
+    <!-- Unmute -->
+    <button class="unmute-btn" id="unmute-btn" onclick="toggleMute()">
+        <span id="unmute-icon">🔇</span>
+        <span id="unmute-text">Tap to Unmute</span>
+    </button>
+
+    <!-- Play/Pause -->
+    <button class="playpause-btn" id="playpause-btn" onclick="togglePlayPause()">
+        <span id="playpause-icon">⏸</span>
+    </button>
+
+    <!-- Progress bar -->
+    <div class="video-progress" id="progress-bar"></div>
+
+    <!-- ════════ LANDING SCREEN ════════ -->
+    <div id="landing-screen">
+        <div class="landing-bg"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="grid-overlay"></div>
+
+        <div class="landing-content">
+
+            <!-- Badge -->
+            <div class="badge">
+                <span class="badge-dot"></span>
+                Now Live
+            </div>
+
+            <!-- Xyro IQ Logo SVG -->
+            <svg class="landing-logo" width="110" height="110" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="lsShield" x1="20%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#1D4ED8"/>
+                        <stop offset="50%" stop-color="#4338CA"/>
+                        <stop offset="100%" stop-color="#7C3AED"/>
+                    </linearGradient>
+                    <linearGradient id="lsCross" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#93C5FD"/>
+                        <stop offset="100%" stop-color="#C4B5FD"/>
+                    </linearGradient>
+                    <linearGradient id="lsSpeed" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#3B82F6" stop-opacity="0"/>
+                        <stop offset="100%" stop-color="#3B82F6"/>
+                    </linearGradient>
+                    <filter id="lsGlow">
+                        <feGaussianBlur stdDeviation="2" result="blur"/>
+                        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                </defs>
+                <!-- Speed lines -->
+                <rect x="12" y="82" width="30" height="4" rx="2" fill="url(#lsSpeed)" opacity="0.9"/>
+                <rect x="18" y="92" width="22" height="3.5" rx="1.75" fill="url(#lsSpeed)" opacity="0.7"/>
+                <rect x="24" y="101" width="16" height="3" rx="1.5" fill="url(#lsSpeed)" opacity="0.5"/>
+                <rect x="8" y="66" width="7" height="7" rx="1.5" fill="#3B82F6" opacity="0.8"/>
+                <rect x="18" y="58" width="5" height="5" rx="1" fill="#3B82F6" opacity="0.6"/>
+                <rect x="6" y="116" width="5" height="5" rx="1" fill="#3B82F6" opacity="0.4"/>
+                <!-- Shield -->
+                <path d="M100 22 L162 44 L162 98 C162 140 100 178 100 178 C100 178 38 140 38 98 L38 44 Z" fill="url(#lsShield)"/>
+                <path d="M100 22 L162 44 L162 98 C162 140 100 178 100 178 L100 22 Z" fill="rgba(255,255,255,0.08)"/>
+                <path d="M100 22 L162 44 L162 98 C162 140 100 178 100 178 C100 178 38 140 38 98 L38 44 Z" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+                <!-- Circle + Cross -->
+                <circle cx="100" cy="100" r="38" fill="none" stroke="url(#lsCross)" stroke-width="3" filter="url(#lsGlow)"/>
+                <circle cx="100" cy="100" r="38" fill="rgba(255,255,255,0.05)"/>
+                <rect x="92" y="74" width="16" height="52" rx="5" fill="url(#lsCross)" opacity="0.95" filter="url(#lsGlow)"/>
+                <rect x="74" y="92" width="52" height="16" rx="5" fill="url(#lsCross)" opacity="0.95"/>
+                <!-- AI Nodes -->
+                <circle cx="170" cy="62" r="7" fill="#7C3AED" filter="url(#lsGlow)"/>
+                <circle cx="170" cy="62" r="7" fill="none" stroke="#A78BFA" stroke-width="1.5" opacity="0.8"/>
+                <circle cx="166" cy="122" r="5.5" fill="#5B21B6" filter="url(#lsGlow)"/>
+                <circle cx="166" cy="122" r="5.5" fill="none" stroke="#A78BFA" stroke-width="1.5" opacity="0.7"/>
+                <path d="M 170 69 Q 185 92 166 116" fill="none" stroke="#A78BFA" stroke-width="2" stroke-dasharray="4 3" opacity="0.8"/>
+                <line x1="163" y1="72" x2="170" y2="66" stroke="#A78BFA" stroke-width="1.5" opacity="0.5"/>
+            </svg>
+
+            <!-- Title -->
+            <div class="landing-title">
+                <span class="title-xyro">Xyro</span>
+                <span class="title-iq">IQ</span>
+            </div>
+
+            <!-- Tagline -->
+            <div class="landing-tagline">
+                <div class="tagline-line tagline-line-l"></div>
+                <span class="tag-predict">PREDICT</span>
+                <span class="tag-dot">●</span>
+                <span class="tag-prevent">PREVENT</span>
+                <span class="tag-dot">●</span>
+                <span class="tag-protect">PROTECT</span>
+                <div class="tagline-line tagline-line-r"></div>
+            </div>
+
+            <!-- Quote -->
+            <div class="quote-box">
+                <div class="quote-text">
+                    "The best time to prevent a denial is
+                    <strong style="color:white;">before</strong> you submit the claim."
+                </div>
+            </div>
+
+            <!-- Feature Pills -->
+            <div class="feature-pills">
+                <div class="pill">🔍 Authorization Likelihood</div>
+                <div class="pill">📊 Documentation Quality Score</div>
+                <div class="pill">🔮 Approval Path Optimizer</div>
+                <div class="pill">📄 Evidence Pack Builder</div>
+                <div class="pill">⚡ Denial Root Cause Analytics</div>
+                <div class="pill">⚡ One Click Appeal Generate</div>
+            </div>
+
+            <!-- CTA -->
+            <div class="cta-wrap">
+                <a class="cta-btn" href="xyro.html">
+                    ⚡ Experience in Reality
+                    <span class="cta-arrow">→</span>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let landed = false;
+        let isMuted = true;
+        let rotateIgnored = false;
+
+        /* ── DEVICE DETECTION ── */
+        function isMobile() {
+            return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 900;
+        }
+        function isPortrait() { return window.innerHeight > window.innerWidth; }
+
+        /* ── LOCK LANDSCAPE (during video) ── */
+        function lockLandscape() {
+            if (!isMobile()) return;
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(() => {
+                    if (isPortrait() && !rotateIgnored) {
+                        document.getElementById('rotate-overlay').classList.add('show');
+                        pauseVideo();
+                    }
+                });
+            } else {
+                if (isPortrait() && !rotateIgnored) {
+                    document.getElementById('rotate-overlay').classList.add('show');
+                    pauseVideo();
+                }
+            }
+        }
+
+        /* ── LOCK PORTRAIT (on landing screen) ── */
+        function lockPortrait() {
+            if (!isMobile()) return;
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('portrait').catch(() => {});
+            }
+            document.getElementById('rotate-overlay').classList.remove('show');
+        }
+
+        /* ── ORIENTATION ── */
+        function checkOrientation() {
+            if (landed || rotateIgnored || !isMobile()) return;
+            const overlay = document.getElementById('rotate-overlay');
+            if (isPortrait()) { overlay.classList.add('show'); pauseVideo(); }
+            else { overlay.classList.remove('show'); resumeVideo(); }
+        }
+
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('orientationchange', () => setTimeout(checkOrientation, 300));
+
+        /* ── VIDEO CONTROLS ── */
+        function pauseVideo() {
+            const v = document.getElementById('intro-video');
+            if (v && !v.paused) v.pause();
+        }
+        function resumeVideo() {
+            const v = document.getElementById('intro-video');
+            if (v && v.paused && !landed) v.play().catch(() => {});
+        }
+        function dismissRotate() {
+            rotateIgnored = true;
+            document.getElementById('rotate-overlay').classList.remove('show');
+            resumeVideo();
+        }
+
+        /* ── MUTE/UNMUTE ── */
+        function toggleMute() {
+            const video = document.getElementById('intro-video');
+            const icon  = document.getElementById('unmute-icon');
+            const text  = document.getElementById('unmute-text');
+            if (!video) return;
+            isMuted = !isMuted;
+            video.muted = isMuted;
+            video.volume = 1.0;
+            icon.textContent = isMuted ? '🔇' : '🔊';
+            text.textContent  = isMuted ? 'Tap to Unmute' : 'Mute';
+        }
+
+        /* ── PLAY/PAUSE ── */
+        function togglePlayPause() {
+            const video = document.getElementById('intro-video');
+            const icon  = document.getElementById('playpause-icon');
+            if (!video) return;
+            if (video.paused) { video.play().catch(() => {}); icon.textContent = '⏸'; }
+            else { video.pause(); icon.textContent = '▶'; }
+        }
+
+        /* ── NO VIDEO FALLBACK ── */
+        function showNoVideo() {
+            document.getElementById('no-video-fallback').style.display = 'flex';
+            setTimeout(showLanding, 4000);
+        }
+
+        /* ── PROGRESS BAR ── */
+        function updateProgress() {
+            const video = document.getElementById('intro-video');
+            if (video && video.duration) {
+                document.getElementById('progress-bar').style.width =
+                    (video.currentTime / video.duration * 100) + '%';
+            }
+        }
+
+        /* ── SHOW LANDING ── */
+        function showLanding() {
+            if (landed) return;
+            landed = true;
+
+            const video       = document.getElementById('intro-video');
+            const videoScreen = document.getElementById('video-screen');
+            const skipBtn     = document.querySelector('.skip-btn');
+            const unmuteBtn   = document.getElementById('unmute-btn');
+            const ppBtn       = document.getElementById('playpause-btn');
+            const progressBar = document.getElementById('progress-bar');
+            const poweredTag  = document.getElementById('powered-tag');
+            const rotateOvl   = document.getElementById('rotate-overlay');
+
+            if (video) video.pause();
+            skipBtn.style.display  = 'none';
+            unmuteBtn.style.display = 'none';
+            ppBtn.style.display    = 'none';
+            rotateOvl.classList.remove('show');
+            progressBar.style.width = '100%';
+
+            lockPortrait();
+            videoScreen.classList.add('fade-out');
+
+            setTimeout(() => {
+                videoScreen.style.display = 'none';
+                document.getElementById('landing-screen').classList.add('show');
+                poweredTag.style.display = 'block';
+            }, 1200);
+        }
+
+        /* ── KEYBOARD SHORTCUT ── */
+        document.addEventListener('keydown', (e) => {
+            if ((e.code === 'Space' || e.code === 'Enter') && !landed) showLanding();
+        });
+
+        /* ── ON LOAD ── */
+        window.addEventListener('load', () => {
+            lockLandscape();
+            setTimeout(() => {
+                const video = document.getElementById('intro-video');
+                if (video && video.readyState === 0 && !landed) showNoVideo();
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

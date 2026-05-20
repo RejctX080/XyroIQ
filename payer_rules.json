@@ -1,0 +1,505 @@
+{
+  "meta": {
+    "version": "2.0",
+    "last_updated": "2026-05-09",
+    "product": "Xyro IQ",
+    "note": "Rule weights sum to 100 per CPT. All keywords lowercase for matching."
+  },
+
+  "payer_rules": {
+
+    "bcbs": {
+      "name": "Blue Cross Blue Shield",
+      "common_denial_reasons": [
+        "Insufficient trial of conservative care",
+        "Missing physical therapy records",
+        "Inadequate symptom duration documentation"
+      ],
+      "72148": {
+        "description": "MRI Lumbar Spine (without contrast)",
+        "specialty": ["orthopedics", "neurology", "general", "pt"],
+        "auth_required": true,
+        "policy_version": "v3.2",
+        "policy_last_updated": "2026-01-01",
+        "turnaround_days": "3-5 business days",
+        "payer_notes": "BCBS requires detailed conservative treatment documentation. PT records must be submitted.",
+        "requirements": [
+          {"id": "duration",    "rule": "Duration: 6+ weeks of symptoms",          "keywords": ["6 weeks","8 weeks","2 months","chronic","ongoing","persistent"],        "weight": 20},
+          {"id": "pt_trial",   "rule": "PT: minimum 6-8 sessions completed",       "keywords": ["physical therapy","pt","sessions","6 sessions","8 sessions","12 sessions","completed therapy"], "weight": 25},
+          {"id": "medication",  "rule": "NSAIDs: 4+ weeks documented trial",        "keywords": ["ibuprofen","naproxen","nsaid","medication","4 weeks","6 weeks","meloxicam","diclofenac"],      "weight": 20},
+          {"id": "objective",   "rule": "Objective physical exam findings",         "keywords": ["straight leg raise","slr","positive","tenderness","decreased sensation","reflex","neurological"], "weight": 20},
+          {"id": "failed_cons", "rule": "Failed conservative care documented",      "keywords": ["failed","minimal relief","inadequate","not improved","persistent pain","no improvement"],      "weight": 15}
+        ]
+      },
+      "99213": {
+        "description": "Office Visit – Established Patient (Level 3)",
+        "specialty": ["general","pt","ortho","cardiology"],
+        "auth_required": false,
+        "policy_version": "v1.0",
+        "policy_last_updated": "2025-01-01",
+        "requirements": []
+      },
+      "93458": {
+        "description": "Left Heart Catheterization",
+        "specialty": ["cardiology"],
+        "auth_required": true,
+        "policy_version": "v2.1",
+        "policy_last_updated": "2026-01-01",
+        "turnaround_days": "Same day for emergent",
+        "requirements": [
+          {"id": "acute",      "rule": "Acute cardiac syndrome documented",         "keywords": ["acute","stemi","mi","unstable angina","acs","chest pain","myocardial"],          "weight": 30},
+          {"id": "testing",    "rule": "Positive cardiac testing or elevated labs", "keywords": ["stress test","troponin","elevated","ischemia","ekg changes","st elevation"],     "weight": 30},
+          {"id": "cardiology", "rule": "Cardiology evaluation completed",           "keywords": ["cardiology","cardiologist","consultation","interventional"],                      "weight": 20},
+          {"id": "setting",    "rule": "Appropriate clinical setting",              "keywords": ["hospital","inpatient","admitted","emergency","cath lab","icu"],                  "weight": 20}
+        ]
+      },
+      "97110": {
+        "description": "Therapeutic Exercises (PT)",
+        "specialty": ["pt","ot"],
+        "auth_required": true,
+        "policy_version": "v2.0",
+        "policy_last_updated": "2025-10-01",
+        "turnaround_days": "2-3 business days",
+        "visit_limit_per_year": 30,
+        "reauth_frequency_visits": 8,
+        "payer_notes": "BCBS requires functional progress documentation every 8 visits",
+        "requirements": [
+          {"id": "diagnosis",   "rule": "Documented diagnosis requiring therapy",   "keywords": ["diagnosis","injury","fracture","post-surgical","weakness","impairment"],         "weight": 25},
+          {"id": "functional",  "rule": "Functional deficit documented",            "keywords": ["functional","deficit","limitation","inability","reduced","impaired"],            "weight": 30},
+          {"id": "progress",    "rule": "Measurable goals established",             "keywords": ["goal","improve","increase","decrease","functional goal","measurable"],          "weight": 25},
+          {"id": "physician",   "rule": "Physician referral/order present",         "keywords": ["referral","order","prescribed","physician","md","do","ordered by"],            "weight": 20}
+        ]
+      },
+      "97140": {
+        "description": "Manual Therapy (PT/OT)",
+        "specialty": ["pt","ot"],
+        "auth_required": true,
+        "policy_version": "v1.5",
+        "policy_last_updated": "2025-10-01",
+        "turnaround_days": "2-3 business days",
+        "visit_limit_per_year": 30,
+        "reauth_frequency_visits": 8,
+        "requirements": [
+          {"id": "indication",  "rule": "Clinical indication for manual therapy",   "keywords": ["joint","restriction","mobility","stiffness","hypomobility","manual"],           "weight": 30},
+          {"id": "functional",  "rule": "Functional limitation documented",         "keywords": ["limitation","restriction","pain","range of motion","rom"],                     "weight": 30},
+          {"id": "physician",   "rule": "Physician order documented",               "keywords": ["referral","order","prescribed","physician","md"],                              "weight": 20},
+          {"id": "progress",    "rule": "Progress toward goals noted",              "keywords": ["progress","improvement","goal","functional","measurable"],                     "weight": 20}
+        ]
+      }
+    },
+
+    "uhc": {
+      "name": "UnitedHealthcare",
+      "common_denial_reasons": [
+        "Incorrect facility type (outpatient vs inpatient)",
+        "Missing specialist consultation",
+        "Non-acute indication for emergent procedure"
+      ],
+      "72148": {
+        "description": "MRI Lumbar Spine (without contrast)",
+        "specialty": ["orthopedics","neurology","general","pt"],
+        "auth_required": true,
+        "policy_version": "v4.1",
+        "policy_last_updated": "2026-02-15",
+        "turnaround_days": "3-5 business days",
+        "payer_notes": "UHC requires minimum 8 PT sessions. Stricter than BCBS.",
+        "requirements": [
+          {"id": "duration",    "rule": "Duration: 6+ weeks of symptoms",           "keywords": ["6 weeks","8 weeks","chronic","ongoing","2 months"],                           "weight": 20},
+          {"id": "pt_trial",   "rule": "PT: minimum 8 sessions (UHC stricter)",     "keywords": ["8 sessions","10 sessions","12 sessions","eight sessions","physical therapy completed"], "weight": 25},
+          {"id": "medication",  "rule": "NSAIDs: 6+ weeks trial (UHC stricter)",    "keywords": ["ibuprofen","naproxen","nsaid","6 weeks","8 weeks","extended trial"],           "weight": 20},
+          {"id": "objective",   "rule": "Objective neurological findings",           "keywords": ["slr","positive","neurological","decreased sensation","reflex change"],        "weight": 20},
+          {"id": "failed_cons", "rule": "Failed conservative care",                 "keywords": ["failed","inadequate","not improved","no improvement"],                        "weight": 15}
+        ]
+      },
+      "99213": {
+        "description": "Office Visit – Established Patient (Level 3)",
+        "specialty": ["general","pt","ortho","cardiology"],
+        "auth_required": false,
+        "policy_version": "v1.0",
+        "policy_last_updated": "2025-01-01",
+        "requirements": []
+      },
+      "93458": {
+        "description": "Left Heart Catheterization",
+        "specialty": ["cardiology"],
+        "auth_required": true,
+        "policy_version": "v3.0",
+        "policy_last_updated": "2026-03-01",
+        "turnaround_days": "Same day for emergent",
+        "payer_notes": "⚠️ UHC CRITICAL: INPATIENT HOSPITAL ONLY. Will deny outpatient facility 95% of the time.",
+        "facility_critical": true,
+        "allowed_facilities": ["memorial-main","cardiac-specialty","inpatient-hospital"],
+        "denied_facilities": ["outpatient-center","memorial-north","imaging-center"],
+        "facility_denial_message": "UnitedHealthcare WILL DENY: Cardiac catheterization must be performed at an INPATIENT hospital facility. Outpatient centers are not approved for this procedure.",
+        "denial_keywords": ["stable","chronic","elective","outpatient center","routine"],
+        "requirements": [
+          {"id": "acute",      "rule": "ACUTE indication — NOT elective",           "keywords": ["acute","stemi","myocardial infarction","emergency","unstable","acs"],          "weight": 35},
+          {"id": "troponin",   "rule": "Elevated troponin documented",              "keywords": ["troponin","elevated","positive troponin","lab results"],                      "weight": 30},
+          {"id": "inpatient",  "rule": "INPATIENT hospital setting confirmed",      "keywords": ["admitted","inpatient","hospital","emergency department","icu","ccu"],         "weight": 20},
+          {"id": "cardiology", "rule": "Cardiology consultation documented",        "keywords": ["cardiology","cardiologist","consultation","interventional cardiology"],       "weight": 15}
+        ]
+      },
+      "97110": {
+        "description": "Therapeutic Exercises (PT)",
+        "specialty": ["pt","ot"],
+        "auth_required": true,
+        "policy_version": "v2.2",
+        "policy_last_updated": "2026-01-01",
+        "turnaround_days": "2-3 business days",
+        "visit_limit_per_year": 25,
+        "reauth_frequency_visits": 6,
+        "payer_notes": "UHC requires re-auth every 6 visits. Stricter than BCBS.",
+        "requirements": [
+          {"id": "diagnosis",   "rule": "Specific diagnosis documented",            "keywords": ["diagnosis","icd","injury","condition","disorder","impairment"],               "weight": 25},
+          {"id": "functional",  "rule": "Functional deficit and goals documented",  "keywords": ["functional","deficit","limitation","goal","measurable outcome"],              "weight": 35},
+          {"id": "progress",    "rule": "Progress notes (every 6 visits required)", "keywords": ["progress","improved","goal met","functional gain","outcome"],               "weight": 25},
+          {"id": "physician",   "rule": "Physician order required",                 "keywords": ["order","referral","prescribed","md","physician"],                            "weight": 15}
+        ]
+      },
+      "97140": {
+        "description": "Manual Therapy (PT/OT)",
+        "specialty": ["pt","ot"],
+        "auth_required": true,
+        "policy_version": "v1.8",
+        "policy_last_updated": "2026-01-01",
+        "turnaround_days": "2-3 business days",
+        "visit_limit_per_year": 25,
+        "reauth_frequency_visits": 6,
+        "requirements": [
+          {"id": "indication",  "rule": "Clinical indication documented",           "keywords": ["joint restriction","hypomobility","stiffness","manual therapy indicated"],   "weight": 30},
+          {"id": "functional",  "rule": "Functional limitation with goals",         "keywords": ["limitation","rom","range of motion","pain","functional goal"],               "weight": 35},
+          {"id": "physician",   "rule": "Physician order",                          "keywords": ["order","referral","prescribed","physician","md","do"],                       "weight": 20},
+          {"id": "progress",    "rule": "Progress documented (every 6 visits)",     "keywords": ["progress","improvement","measurable","goal"],                               "weight": 15}
+        ]
+      }
+    },
+
+    "aetna": {
+      "name": "Aetna",
+      "common_denial_reasons": [
+        "No specialist referral documented",
+        "Insufficient clinical indication",
+        "Missing red flag documentation"
+      ],
+      "72148": {
+        "description": "MRI Lumbar Spine (without contrast)",
+        "specialty": ["orthopedics","neurology","general","pt"],
+        "auth_required": true,
+        "policy_version": "v2.5",
+        "policy_last_updated": "2025-12-01",
+        "turnaround_days": "2-4 business days",
+        "requirements": [
+          {"id": "duration",    "rule": "Duration: 6+ weeks",                       "keywords": ["6 weeks","8 weeks","chronic","ongoing"],                                      "weight": 20},
+          {"id": "pt_trial",   "rule": "PT trial completed",                        "keywords": ["physical therapy","pt","sessions","therapy"],                               "weight": 25},
+          {"id": "medication",  "rule": "Medication trial documented",               "keywords": ["ibuprofen","naproxen","nsaid","medication"],                                "weight": 20},
+          {"id": "objective",   "rule": "Objective exam findings",                   "keywords": ["slr","tenderness","neurological","positive"],                              "weight": 20},
+          {"id": "failed_cons", "rule": "Conservative failure documented",           "keywords": ["failed","inadequate","not improved"],                                       "weight": 15}
+        ]
+      },
+      "99213": {
+        "description": "Office Visit – Established Patient",
+        "specialty": ["general","pt","ortho","cardiology"],
+        "auth_required": false,
+        "policy_version": "v1.0",
+        "policy_last_updated": "2025-01-01",
+        "requirements": []
+      },
+      "93458": {
+        "description": "Left Heart Catheterization",
+        "specialty": ["cardiology"],
+        "auth_required": true,
+        "policy_version": "v2.0",
+        "policy_last_updated": "2026-01-01",
+        "turnaround_days": "Same day for emergent",
+        "requirements": [
+          {"id": "acute",      "rule": "Acute cardiac event",                       "keywords": ["acute","stemi","mi","acs","unstable"],                                       "weight": 30},
+          {"id": "testing",    "rule": "Positive cardiac testing",                  "keywords": ["troponin","stress test","ischemia","ekg"],                                  "weight": 30},
+          {"id": "cardiology", "rule": "Cardiology involved",                       "keywords": ["cardiology","cardiologist","consultation"],                                 "weight": 20},
+          {"id": "setting",    "rule": "Hospital setting",                          "keywords": ["hospital","inpatient","admitted"],                                          "weight": 20}
+        ]
+      },
+      "97110": {
+        "description": "Therapeutic Exercises (PT)",
+        "specialty": ["pt","ot"],
+        "auth_required": true,
+        "policy_version": "v1.5",
+        "policy_last_updated": "2025-10-01",
+        "turnaround_days": "2-3 business days",
+        "visit_limit_per_year": 30,
+        "reauth_frequency_visits": 10,
+        "requirements": [
+          {"id": "diagnosis",   "rule": "Documented diagnosis",                     "keywords": ["diagnosis","condition","injury","disorder"],                                 "weight": 25},
+          {"id": "functional",  "rule": "Functional deficit documented",            "keywords": ["functional","deficit","limitation","reduced","impaired"],                   "weight": 30},
+          {"id": "physician",   "rule": "Physician order",                          "keywords": ["order","referral","prescribed","physician","md"],                           "weight": 20},
+          {"id": "progress",    "rule": "Goals and progress documented",            "keywords": ["goal","progress","measurable","outcome","improvement"],                    "weight": 25}
+        ]
+      }
+    },
+
+    "cigna": {
+      "name": "Cigna",
+      "common_denial_reasons": [
+        "No imaging evidence provided",
+        "Inadequate conservative treatment trial",
+        "Missing objective findings"
+      ],
+      "72148": {
+        "description": "MRI Lumbar Spine (without contrast)",
+        "specialty": ["orthopedics","neurology","general","pt"],
+        "auth_required": true,
+        "policy_version": "v2.3",
+        "policy_last_updated": "2025-11-01",
+        "turnaround_days": "3-5 business days",
+        "requirements": [
+          {"id": "duration",    "rule": "6+ weeks symptoms",                        "keywords": ["6 weeks","8 weeks","chronic","ongoing"],                                      "weight": 20},
+          {"id": "pt_trial",   "rule": "PT completed",                              "keywords": ["physical therapy","pt","sessions","therapy"],                               "weight": 25},
+          {"id": "medication",  "rule": "NSAIDs trial",                              "keywords": ["ibuprofen","nsaid","medication","naproxen"],                               "weight": 20},
+          {"id": "objective",   "rule": "Clinical findings documented",              "keywords": ["slr","positive","neurological","tenderness"],                              "weight": 20},
+          {"id": "failed_cons", "rule": "Failed conservative",                       "keywords": ["failed","inadequate","not improved"],                                       "weight": 15}
+        ]
+      },
+      "99213": {
+        "description": "Office Visit – Established Patient",
+        "specialty": ["general","pt","ortho","cardiology"],
+        "auth_required": false,
+        "policy_version": "v1.0",
+        "policy_last_updated": "2025-01-01",
+        "requirements": []
+      },
+      "97110": {
+        "description": "Therapeutic Exercises (PT)",
+        "specialty": ["pt","ot"],
+        "auth_required": true,
+        "policy_version": "v1.3",
+        "policy_last_updated": "2025-10-01",
+        "turnaround_days": "2-3 business days",
+        "visit_limit_per_year": 30,
+        "reauth_frequency_visits": 8,
+        "requirements": [
+          {"id": "diagnosis",   "rule": "Diagnosis documented",                     "keywords": ["diagnosis","injury","condition","disorder"],                                 "weight": 25},
+          {"id": "functional",  "rule": "Functional goals established",             "keywords": ["functional","goal","limitation","impaired","deficit"],                      "weight": 30},
+          {"id": "physician",   "rule": "Physician referral",                       "keywords": ["referral","order","physician","prescribed","md"],                           "weight": 20},
+          {"id": "progress",    "rule": "Progress notes included",                  "keywords": ["progress","improvement","goal met","outcome","functional gain"],           "weight": 25}
+        ]
+      }
+    },
+
+    "medicare": {
+      "name": "Medicare",
+      "common_denial_reasons": [
+        "Service not medically necessary",
+        "Insufficient documentation of medical need",
+        "Benefit not covered under Medicare"
+      ],
+      "72148": {
+        "description": "MRI Lumbar Spine",
+        "specialty": ["orthopedics","neurology","general","pt"],
+        "auth_required": false,
+        "policy_version": "v5.0",
+        "policy_last_updated": "2026-01-01",
+        "payer_notes": "Medicare does not require prior auth for most imaging but requires strong medical necessity documentation.",
+        "requirements": [
+          {"id": "necessity",   "rule": "Medical necessity clearly documented",     "keywords": ["medically necessary","clinical indication","diagnostic purpose"],            "weight": 40},
+          {"id": "objective",   "rule": "Objective findings present",               "keywords": ["neurological","positive","deficit","impairment","finding"],                "weight": 35},
+          {"id": "failed_cons", "rule": "Conservative treatment attempted",         "keywords": ["failed","therapy","medication","conservative"],                            "weight": 25}
+        ]
+      },
+      "99213": {
+        "description": "Office Visit – Established Patient",
+        "specialty": ["general","pt","ortho","cardiology"],
+        "auth_required": false,
+        "policy_version": "v1.0",
+        "policy_last_updated": "2025-01-01",
+        "requirements": []
+      },
+      "97110": {
+        "description": "Therapeutic Exercises (PT)",
+        "specialty": ["pt","ot"],
+        "auth_required": false,
+        "policy_version": "v3.0",
+        "policy_last_updated": "2026-01-01",
+        "visit_limit_per_year": null,
+        "payer_notes": "Medicare allows PT without prior auth but requires ongoing medical necessity documentation.",
+        "requirements": [
+          {"id": "necessity",   "rule": "Medical necessity each visit",             "keywords": ["medically necessary","clinical need","skilled therapy","therapist"],        "weight": 40},
+          {"id": "progress",    "rule": "Measurable progress documented",           "keywords": ["progress","measurable","functional gain","improved","goal"],               "weight": 35},
+          {"id": "physician",   "rule": "Plan of care signed by physician",         "keywords": ["plan of care","physician signature","md","certified","order"],            "weight": 25}
+        ]
+      }
+    }
+  },
+
+  "carc_rarc_mappings": {
+    "note": "CARC = Claim Adjustment Reason Code | RARC = Remittance Advice Remark Code",
+    "carc": {
+      "4":   {"category": "Prior Auth Required",       "description": "Service requires prior authorization"},
+      "5":   {"category": "Coordination of Benefits",  "description": "Procedure code/bill type mismatch"},
+      "11":  {"category": "Not Covered",               "description": "Service not covered by plan"},
+      "15":  {"category": "Eligibility Issue",         "description": "Patient not eligible on date of service"},
+      "16":  {"category": "Documentation Missing",     "description": "Claim lacks required information"},
+      "18":  {"category": "Duplicate Claim",           "description": "Previously adjudicated claim"},
+      "22":  {"category": "Coordination of Benefits",  "description": "This care may be covered by another payer"},
+      "27":  {"category": "Eligibility Issue",         "description": "Expenses incurred after coverage ended"},
+      "29":  {"category": "Timely Filing",             "description": "Claim not filed in timely manner"},
+      "45":  {"category": "Contractual Adjustment",    "description": "Charge exceeds fee schedule"},
+      "96":  {"category": "Not Covered",               "description": "Non-covered charge(s)"},
+      "97":  {"category": "Bundling",                  "description": "Included in allowance for another procedure"},
+      "119": {"category": "Prior Auth Required",       "description": "Benefit maximum reached for period"},
+      "167": {"category": "Not Covered",               "description": "This diagnosis is not covered"},
+      "197": {"category": "Prior Auth Required",       "description": "Precertification/authorization absent"},
+      "204": {"category": "Not Medically Necessary",   "description": "Service, equipment, drugs not covered/justified"}
+    },
+    "rarc": {
+      "N1":   {"category": "Documentation Missing",   "description": "Additional information required"},
+      "N4":   {"category": "Prior Auth Required",      "description": "Missing/incomplete/invalid prior auth"},
+      "N56":  {"category": "Eligibility Issue",        "description": "Incomplete/invalid patient ID"},
+      "N104": {"category": "Bundling",                 "description": "Service included in global surgical package"},
+      "N115": {"category": "Not Medically Necessary",  "description": "This decision was based on clinical guidelines"},
+      "N130": {"category": "Not Covered",              "description": "Consult plan benefit documents for restrictions"},
+      "N362": {"category": "Documentation Missing",    "description": "Additional payment or credits cannot be applied"},
+      "N479": {"category": "Prior Auth Required",      "description": "A prior authorization number is required"},
+      "M86":  {"category": "Timely Filing",            "description": "Service denied because plan hasn't been established"},
+      "MA61": {"category": "Eligibility Issue",        "description": "Patient not identified as insured"}
+    }
+  },
+
+  "specialty_rules": {
+    "pt": {
+      "name": "Physical Therapy",
+      "visit_tracking": true,
+      "reauth_required": true,
+      "functional_progress_required": true,
+      "common_cpt_codes": ["97110","97140","97530","97012","97026","97150"],
+      "notes": "PT requires re-authorization at payer-specific visit thresholds. Document functional progress every visit."
+    },
+    "ot": {
+      "name": "Occupational Therapy",
+      "visit_tracking": true,
+      "reauth_required": true,
+      "functional_progress_required": true,
+      "common_cpt_codes": ["97165","97166","97167","97168","97110"],
+      "notes": "OT requires same documentation standards as PT. Focus on ADL functional outcomes."
+    },
+    "st": {
+      "name": "Speech Therapy",
+      "visit_tracking": true,
+      "reauth_required": true,
+      "functional_progress_required": true,
+      "common_cpt_codes": ["92507","92508","92526"],
+      "notes": "ST requires swallowing study or language assessment baseline for medical necessity."
+    },
+    "cardiology": {
+      "name": "Cardiology",
+      "visit_tracking": false,
+      "reauth_required": true,
+      "functional_progress_required": false,
+      "common_cpt_codes": ["93458","93306","93000","93010"],
+      "notes": "Invasive cardiac procedures require acute clinical indication. Facility type critical for UHC."
+    },
+    "orthopedics": {
+      "name": "Orthopedics",
+      "visit_tracking": false,
+      "reauth_required": true,
+      "functional_progress_required": false,
+      "common_cpt_codes": ["72148","27447","27130","29881"],
+      "notes": "Surgical procedures require step therapy documentation (PT/medication trial)."
+    },
+    "general": {
+      "name": "General / Multi-specialty",
+      "visit_tracking": false,
+      "reauth_required": true,
+      "functional_progress_required": false,
+      "common_cpt_codes": ["99213","72148"],
+      "notes": "General specialty mix. Apply standard payer rules."
+    }
+  },
+
+  "denial_scenarios": {
+    "documentation_missing": {
+      "label": "Documentation Missing",
+      "description": "Clinical notes lack required elements for payer approval",
+      "typical_carc": ["16","197"],
+      "typical_rarc": ["N1","N479"],
+      "resolution": "Supplement with specific missing clinical documentation"
+    },
+    "not_medically_necessary": {
+      "label": "Not Medically Necessary",
+      "description": "Payer determines service not clinically justified",
+      "typical_carc": ["204","167"],
+      "typical_rarc": ["N115"],
+      "resolution": "Request peer-to-peer review. Provide additional clinical evidence."
+    },
+    "prior_auth_missing": {
+      "label": "Prior Authorization Missing",
+      "description": "Service performed without required prior authorization",
+      "typical_carc": ["4","197","119"],
+      "typical_rarc": ["N4","N479"],
+      "resolution": "File retrospective authorization or appeal with clinical justification"
+    },
+    "wrong_facility": {
+      "label": "Wrong Facility Type",
+      "description": "Service performed at facility not approved by payer for procedure",
+      "typical_carc": ["5"],
+      "typical_rarc": ["N130"],
+      "resolution": "Transfer case to approved facility or request exception with clinical justification"
+    },
+    "eligibility_issue": {
+      "label": "Eligibility / Coverage Issue",
+      "description": "Patient not covered on date of service or incorrect payer",
+      "typical_carc": ["15","27"],
+      "typical_rarc": ["N56","MA61"],
+      "resolution": "Verify eligibility. Check coordination of benefits."
+    },
+    "timely_filing": {
+      "label": "Timely Filing Exceeded",
+      "description": "Claim submitted beyond payer's filing deadline",
+      "typical_carc": ["29"],
+      "typical_rarc": ["M86"],
+      "resolution": "File appeal with proof of timely filing documentation"
+    },
+    "bundling": {
+      "label": "Bundling / Duplicate",
+      "description": "Service included in payment for another procedure",
+      "typical_carc": ["97","18"],
+      "typical_rarc": ["N104"],
+      "resolution": "Review coding. Unbundle if appropriate. Add modifier if separate service."
+    }
+  },
+
+  "confidence_scoring": {
+    "note": "Used by Xyro IQ Documentation Quality Score engine",
+    "high_quality_signals": [
+      "specific dates","completed","documented","records","sessions",
+      "ibuprofen","physical therapy","straight leg raise","slr",
+      "failed","inadequate","chronic","weeks","physician","ordered by"
+    ],
+    "low_quality_signals": [
+      "approximately","around","maybe","unsure","sometime","unclear",
+      "patient states","patient reports without","vague"
+    ],
+    "contradictory_signals": [
+      "but refused","however declined","did not complete","patient refused",
+      "non-compliant","cancelled","no-show"
+    ],
+    "specificity_indicators": [
+      "\\d+ sessions","\\d+ weeks","\\d+mg","\\d+\\/\\d+\\/\\d+",
+      "march|april|may|june|january|february|december",
+      "\\d+\\/10 pain","positive at \\d+ degrees"
+    ]
+  },
+
+  "fraud_prevention": {
+    "disclaimer": "Xyro IQ analyzes existing clinical documentation only. The system never generates, suggests, or modifies clinical facts. All clinical documentation must be completed by licensed healthcare providers. Any addition to medical records must reflect actual clinical events.",
+    "prohibited_actions": [
+      "Generating clinical history not documented by provider",
+      "Suggesting patient completed treatment they did not receive",
+      "Auto-populating clinical findings without provider verification",
+      "Modifying medical records for billing purposes"
+    ],
+    "legal_references": [
+      "False Claims Act (31 U.S.C. §§ 3729–3733)",
+      "Anti-Kickback Statute (42 U.S.C. § 1320a-7b(b))",
+      "HIPAA Privacy Rule (45 CFR Parts 160 and 164)"
+    ]
+  }
+}
