@@ -222,23 +222,6 @@ Xyro IQ is built with compliance at its core.
 
 ---
 
-## Technology Stack
-
-```
-Frontend     →  HTML5, CSS3, Vanilla JavaScript
-Rule Engine  →  JSON-based payer rules (payer_rules.json)
-AI Engine    →  Rule-based NLP scoring (prototype)
-             →  Claude API / LLM integration (production)
-Rules DB     →  JSON (prototype) → PostgreSQL (production)
-Hosting      →  GitHub Pages (prototype)
-             →  Cloud infrastructure, HIPAA-compliant (production)
-```
-
-**No installation. No server. No API key. No backend.**
-Open `index.html` in any browser and it works.
-
----
-
 ## Production Architecture (Roadmap)
 
 ### Phase 1  MVP (Current Prototype)
