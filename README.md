@@ -32,7 +32,7 @@
 ```
 Service Scheduled
        ↓
-Auth Request Initiated
+Auth Request by client
        ↓
 [ ★ XYRO IQ AUTH CHECK ]  ← This is where Xyro IQ operates
    • Score documentation quality
@@ -40,7 +40,7 @@ Auth Request Initiated
    • Flag missing evidence
    • Route: Submit / Review / Block / Appeal
        ↓
-Payer Submission
+Initiate via portal or call
        ↓
 Claim Adjudicated
 ```
